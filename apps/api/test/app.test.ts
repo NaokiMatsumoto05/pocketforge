@@ -348,7 +348,11 @@ test('project job lock prevents manual writes while runtime command is active', 
       app.inject({ method, url, payload, cookies: { pf_session: session } });
     const p = (await call('POST', '/api/projects', { name: 'Lock' })).json();
     const root = '/api/projects/' + p.id;
-    await call('POST', root + '/command', { command: 'test' });
+    const starts = await Promise.all([
+      call('POST', root + '/command', { command: 'test' }),
+      call('POST', root + '/command', { command: 'simultaneous' }),
+    ]);
+    assert.deepEqual(starts.map((r) => r.statusCode).sort(), [200, 409]);
     assert.equal(
       (await call('PUT', root + '/file', { path: 'App.tsx', content: 'conflict', revision: 1 }))
         .statusCode,

@@ -108,3 +108,7 @@ E2Bは今回まだ実接続していません。通信制限やテンプレー�
 - [EASの環境変数](https://docs.expo.dev/eas/environment-variables/)
 - [EASの送信除外設定](https://docs.expo.dev/build-reference/easignore/)
 - [E2B Sandbox](https://docs.e2b.dev/sandbox)
+
+## 2026-10-27 更新
+
+ユーザーからiPhoneでの起動確認を受領。現在は接続先設定段階です。公開先はRender Free＋Neon Freeに決定し、[専用手順](RENDER_NEON.md)を追加しました。接続先は実際に公開したRenderのHTTPSルートURLを使い、ExpoのプロジェクトURL・localhost・Neon接続文字列は入力しません。最新の公開状況は[進捗報告書](PROGRESS.md)を確認してください。

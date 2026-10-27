@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { normalizeServerUrl } from '@pocketforge/core';
+import { probeServer } from './server-probe';
 
 export let API_URL =
   process.env.EXPO_PUBLIC_API_URL ||
@@ -47,30 +48,7 @@ export class ApiError extends Error {
   }
 }
 export async function checkServer(value: string) {
-  const origin = normalizeServerUrl(value);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 120000);
-  try {
-    const response = await fetch(origin + '/api/health', {
-      credentials: 'omit',
-      signal: controller.signal,
-      redirect: 'error',
-    });
-    const health = await response.json();
-    if (!response.ok || health.service !== 'pocketforge' || health.status !== 'ok')
-      throw new Error('PocketForgeのサーバーを確認できませんでした。URLを確認してください。');
-    return {
-      origin,
-      version: String(health.version),
-      registrationAllowed: Boolean(health.registrationAllowed),
-    };
-  } catch {
-    throw new Error(
-      'PocketForgeに接続できません。HTTPS証明書・サーバーURL・iPhoneの通信を確認してください。',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
+  return probeServer(normalizeServerUrl(value));
 }
 export async function api<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   if (Platform.OS !== 'web' && !API_URL) throw new Error('接続先のサーバーURLを設定してください。');

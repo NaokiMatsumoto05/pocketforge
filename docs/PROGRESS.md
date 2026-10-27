@@ -14,13 +14,13 @@
 | アプリの画面・編集・保存・履歴 | 初期版を実装し、ローカルで動作確認済み |
 | 白黒基調のデザイン | 反映済み、スマートフォン幅で表示確認済み |
 | 4社のAI接続 | 接続処理・設定・切り替えを実装済み。実サービスでの確認は未実施 |
-| 自動検証 | 型チェックと20件のテスト成功。独立したPostgreSQLへのTLS実通信を含む。AIはテスト応答 |
+| 自動検証 | 型チェックと22件のテスト成功。独立したPostgreSQLへのTLS実通信を含む。AIはテスト応答 |
 | Webビルド | 直近の変更を含めて成功 |
 | iOS・Android | ユーザーがiPhoneでの起動を確認。接続先設定以降・Android実機は未確認 |
 | iPhoneの接続準備 | HTTPS確認・Bearer認証を実装。EAS設定・送信アーカイブを検査。公開TLS接続は未確認 |
 | EAS連携 | PocketForge連携済み。ユーザーがDevelopment Buildで起動を確認（ユーザー報告） |
 | クラウド実行・ストア配布・本番公開 | 接続実装または設計段階。実運用は未確認 |
-| 無料枠での公開構成 | 2026-10-27にユーザーがRender Free＋Neon Freeを採用。PostgreSQL対応・専用Neon Freeプロジェクト作成済み。Render公開作業中 |
+| 無料枠での公開構成 | 2026-10-27にユーザーがRender Free＋Neon Freeを採用。PostgreSQL対応・専用Neon Freeプロジェクト作成・実保存確認済み。Render秘密情報登録の承認待ち |
 | AWSとの比較 | 比較済み。今回の実験はRender＋Neonを選択 |
 
 ## 作業履歴
@@ -119,9 +119,12 @@
 - **ユーザーの報告・指示：** iPhoneで起動でき、接続先サーバーの設定で止まっている。RenderはMy Workspaceに新規プロジェクト、GitHubはNaokiMatsumoto05を指定。
 - **実機の確認範囲：** アプリ起動と接続先設定画面までユーザーが確認。エージェントはiPhone画面を直接確認していない。ログイン・AI編集・保存は実機未確認。
 - **実装：** PostgreSQL/SQLite共通の非同期保存処理、PostgreSQL行ロック・トランザクション、TLS証明書検証、固定VAULT_KEY、Render上のSQLite誤利用拒否を追加。ユーザー・セッション・ファイル・履歴・暗号化接続情報・ジョブをDB保存。非同期化に伴うジョブ/手動編集の排他とログ保存を調整。接続待ちを最大2分に延長。
-- **検証：** 型チェック・20件のテストが成功。既存SQLiteのテストと、既存DBから独立して一時起動したPostgreSQLへのTLS接続で、AIのテスト応答によるファイル保存、後続AI要求失敗後の保存、競合、ロールバック、再接続後の履歴・秘密情報・セッション・中断ジョブ復旧を確認。実AIは呼び出していない。
+- **検証：** 型チェック・22件のテストが成功。既存SQLiteのテストと、既存DBから独立して一時起動したPostgreSQLへのTLS接続で、AIのテスト応答によるファイル保存、後続AI要求失敗後の保存、競合、ロールバック、再接続後の履歴・秘密情報・セッション・中断ジョブ復旧を確認。実AIは呼び出していない。
 - **外部設定：** RenderのMy Workspaceをユーザーが指定。GitHub DesktopでNaokiMatsumoto05を確認。Neonの既存組織はLaunchだったため、新規PocketForge組織をFreeで作成し、その中にpocketforge DB（Singapore / PostgreSQL 17）を作成。Neon連携ツールはUnknown toolだったが、公式CLIの既存OAuthログインを再利用できた。
-- **状態：** 公開作業中。Renderの接続URL発行・HTTPS実通信・実機からのログインはこれから確認する。
+- **実接続：** 実Neonに実機用アカウントと「接続確認」プロジェクトを作成。TLS経由でファイル・履歴を保存し、接続を開き直してrevision 2と履歴2件を確認。外部AIキーは未登録。
+- **GitHub・Render：** [NaokiMatsumoto05/pocketforge](https://github.com/NaokiMatsumoto05/pocketforge)へ非公開で保存。[RenderのPocketForgeプロジェクト](https://dashboard.render.com/project/prj-dbg765p42hec73dq3hvg)とExperiment環境を作成。
+- **自動承認で停止：** Render Web Service作成時のDATABASE_URL（DBパスワード含む）とVAULT_KEY登録が、秘密情報をRenderへ転送する明示的承認が不足しているとして拒否された。ユーザーへ具体的な2変数・転送先・目的を示して承認を依頼。サービス作成自体は承認範囲という判定。
+- **状態：** 一部完了・秘密情報登録の承認待ち。Render Web Service・接続URLは未作成。HTTPS実通信・実機ログインはこれから確認する。
 - **成果物：** [Render＋Neon手順](RENDER_NEON.md)、[環境設定例](../.env.render.example)。秘密情報は報告書・Git・配布ZIPに含めない。
 
 ## 今後の主な課題
