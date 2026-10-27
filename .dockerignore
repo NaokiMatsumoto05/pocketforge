@@ -1,0 +1,17 @@
+**/node_modules
+**/.data
+**/.data-*
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+**/vault.key
+**/*.sqlite*
+**/*.log
+**/dist
+**/.expo
+**/.git
+**/ios
+**/android
+work
+coverage

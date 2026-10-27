@@ -1,0 +1,33 @@
+{
+  "name": "pocketforge",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "node --import tsx apps/api/src/index.ts",
+    "mobile": "npm run start --workspace @pocketforge/mobile -- --dev-client",
+    "eas": "node scripts/eas.mjs",
+    "test:live-ai": "node --import tsx scripts/verify-live-ai.ts",
+    "account:create": "node --import tsx scripts/create-account.ts",
+    "package:source": "node scripts/package-source.mjs",
+    "web": "npm run web --workspace @pocketforge/mobile",
+    "build:web": "npm run build:web --workspace @pocketforge/mobile",
+    "typecheck": "tsc --noEmit -p apps/api && tsc --noEmit -p apps/mobile",
+    "test": "node --import tsx --test apps/api/test/*.test.ts",
+    "check": "npm run typecheck && npm test",
+    "start": "node --import tsx apps/api/src/index.ts"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "8.23.1",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "~6.0.3"
+  }
+}

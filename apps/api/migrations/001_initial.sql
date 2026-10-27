@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY, name TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sessions(hash TEXT PRIMARY KEY, "userId" TEXT REFERENCES users(id), expires BIGINT NOT NULL);
+CREATE TABLE IF NOT EXISTS projects(id TEXT PRIMARY KEY, owner TEXT REFERENCES users(id), data TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS snapshots(id TEXT PRIMARY KEY, "projectId" TEXT REFERENCES projects(id), label TEXT, revision INTEGER, "createdAt" TEXT, files TEXT);
+CREATE TABLE IF NOT EXISTS events(id BIGSERIAL PRIMARY KEY, "projectId" TEXT REFERENCES projects(id), kind TEXT, message TEXT, "createdAt" TEXT);
+CREATE TABLE IF NOT EXISTS integrations(owner TEXT REFERENCES users(id), provider TEXT, secret TEXT, model TEXT, PRIMARY KEY(owner,provider));
+CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, "projectId" TEXT REFERENCES projects(id), data TEXT, seq BIGSERIAL);
+CREATE INDEX IF NOT EXISTS projects_owner ON projects(owner);
+CREATE INDEX IF NOT EXISTS snapshots_project ON snapshots("projectId", revision);
+CREATE INDEX IF NOT EXISTS events_project ON events("projectId", id);
+CREATE INDEX IF NOT EXISTS jobs_project ON jobs("projectId", seq);
+CREATE INDEX IF NOT EXISTS sessions_expires ON sessions(expires);

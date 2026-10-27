@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env.server
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4310
+      DATA_DIR: /data
+      TRUST_PROXY: '1'
+      ALLOW_REGISTRATION: 'false'
+    volumes:
+      - pocketforge_data:/data
+    # No host port: only Caddy may reach this backend.
+    expose:
+      - '4310'
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      POCKETFORGE_DOMAIN: ${POCKETFORGE_DOMAIN:?Set POCKETFORGE_DOMAIN in .env.server}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+volumes:
+  pocketforge_data:
+  caddy_data:
+  caddy_config:
