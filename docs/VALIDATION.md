@@ -74,7 +74,7 @@
 - 実機、HTTPS公開環境、複数端末での長時間運用。
 - npm auditのExpoツールチェーン警告5件（詳細はSECURITY.md）。
 
-有料リソースと本番デプロイは実行していません。
+有料リソースは作成していません。10/28にFreeの実験環境を公開しました（下記参照）。
 
 ## 2026-10-27 PostgreSQL・クラウド接続準備
 
@@ -85,3 +85,13 @@
 - 実Neon Free（PocketForge専用組織、Singapore、PostgreSQL 17）でアカウント作成、ファイル保存、接続を開き直した後のrevision・履歴を確認。AIキーは未登録。
 - GitHubのNaokiMatsumoto05/pocketforgeへ非公開で保存。実値入り.env、DB、暗号鍵、作業ファイルを除外。
 - Render My Workspace内にPocketForgeプロジェクトとExperiment環境を作成。サービスへのDATABASE_URL/VAULT_KEY登録は、自動承認レビューが明示的承認を要求したため待機中。
+
+## 2026-10-28 Render公開の実検証
+
+ユーザーの明示承認後、DATABASE_URLとVAULT_KEYをRenderへ登録。Free/Singaporeで公開し、初回およびヘルスチェック更新後のデプロイliveを確認。https://pocketforge.onrender.com への実HTTPで、PostgreSQL・新規登録停止・未認証401・Bearerログイン・ファイル保存・ログアウト失効・再ログイン後の読み出し・履歴・ZIPを確認した。これはデスクトップからのHTTP試験で、iPhone実機試験ではない。再配置後もファイル・履歴は保持された。
+
+実通信で、本文なしPOSTのJSONヘッダーがログアウト400を起こす不具合を検出。クライアントと実AI検証スクリプトを修正し、正しい要求でログアウトとセッション失効を確認。外部AIキーは未登録。実AI検証スクリプトの開始は自動承認レビューに拒否され、AIへの送信は行っていない。
+
+修正commit `4df5c9e` のRenderデプロイ `dep-dbgmposs728c73914q10` がlive。クラウド上でWebビルドが成功し、公開後のHTTPS試験を再実行して認証・保存・失効・再読み出し・ZIPがすべて成功、revision 3を保持。ローカル型チェックも成功。
+
+追加のローカル自動テスト・Webビルドは10分以上完了せず停止。今回の全自動テスト完了とは記録しない。型チェックと公開環境の確認結果は上記のとおり。10/27の22件成功は以前の検証結果。

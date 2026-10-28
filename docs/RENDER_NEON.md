@@ -1,6 +1,6 @@
 # Render Free + Neon Free
 
-2026-10-27。実験用の単一APIプロセス構成。公開URL・実配置結果は[進捗報告書](PROGRESS.md)を正本とする。
+2026-10-28。実験用の単一APIプロセス構成。公開先は https://pocketforge.onrender.com 。実配置結果は[進捗報告書](PROGRESS.md)を正本とする。
 
 ## 構成
 
