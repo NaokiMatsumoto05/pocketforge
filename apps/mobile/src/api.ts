@@ -62,7 +62,7 @@ export async function api<T>(path: string, method = 'GET', body?: unknown): Prom
       credentials: Platform.OS === 'web' ? 'include' : 'omit',
       redirect: 'error',
       headers: {
-        'Content-Type': 'application/json',
+        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
         ...(Platform.OS !== 'web' ? { 'X-Client': 'mobile' } : {}),
         ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       },

@@ -37,7 +37,7 @@ async function request(path: string, method = 'GET', body?: unknown) {
     credentials: 'omit',
     signal: AbortSignal.timeout(30000),
     headers: {
-      'Content-Type': 'application/json',
+      ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       'X-Client': 'mobile',
       ...(token ? { Authorization: 'Bearer ' + token } : {}),
     },
