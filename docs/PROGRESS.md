@@ -1,6 +1,6 @@
 # PocketForge 進捗報告書
 
-作成日：2026年10月25日／最終更新日：2026年10月29日（日本時間）
+作成日：2026年10月25日／最終更新日：2026年11月5日（日本時間）
 対象：スマートフォン完結型AI開発プラットフォーム「PocketForge」
 
 ## 初めて読むAI・開発者へ：目的とコンセプト
@@ -63,6 +63,56 @@
 RenderはPocketForgeの管理API・Web画面の配置先、Neonはその保存先です。ユーザーが作る任意のアプリの実行はE2B側で扱います。ユーザー用バックエンド・DBの自動構築機能は、PocketForge自身のNeon接続とは別の未実装項目です。
 
 本報告書の現在の状況は、直近の実測・ユーザー報告を示します。過去の履歴にある「未公開」「承認待ち」はその日付時点の状態です。既存の[設計書](ARCHITECTURE.md)にはPostgreSQL移行・公開疎通を未実装/未確認とする初期記述が残っていますが、10/27〜10/28の作業で対応・確認済みです。実装判断では本報告書の最新記録と現行ソースを照合してください。
+
+### 最新ファイルの取得・変更履歴の追い方
+
+他のAIへ引き継ぐときは、**GitHubの`main`を共有済みソースの基準にし、取得時点のコミットIDと手元の未反映変更を確認してください。** この報告書に書かれた日付や、以前渡されたZIPだけでは最新版か判断できません。以下はPocketForge本体を開発するAI・開発者向けの手順であり、アプリ利用者にPC操作を要求するものではありません。
+
+| 確認したいもの | 参照先・確認方法 |
+| --- | --- |
+| 共有済みの最新ソース一式 | [GitHubのmain](https://github.com/NaokiMatsumoto05/pocketforge/tree/main)。未pushのローカル作業や他ブランチの未マージ変更は含まれない |
+| 最新の進捗報告書 | [docs/PROGRESS.md](https://github.com/NaokiMatsumoto05/pocketforge/blob/main/docs/PROGRESS.md)。毎回このURLを読み直す |
+| 変更の順序と内容 | [mainのコミット履歴](https://github.com/NaokiMatsumoto05/pocketforge/commits/main/)。対象コミットを開くと変更ファイルと差分が見られる |
+| 報告書だけの変更履歴 | [PROGRESS.mdの履歴](https://github.com/NaokiMatsumoto05/pocketforge/commits/main/docs/PROGRESS.md) |
+| このMacの作業場所 | `/Users/matsumotonaoki/Documents/Codex/2026-10-25/new-chat-2/outputs/pocketforge`。GitHubではこのフォルダーがリポジトリのルートなので、パスは`docs/PROGRESS.md`等となる |
+| 配布用ZIP | 作業フォルダーの1階層上にある`pocketforge-source.zip`。生成時点のコピーであり、自動更新される最新版へのリンクではない |
+
+リポジトリは非公開です。他のAIはユーザーが接続したGitHub連携、または権限のある開発環境から読みます。アクセスできない場合は内容を取得済みと扱わず、権限のある連携か最新のソース提供が必要と報告してください。トークンやパスワードを報告書に書く必要はありません。
+
+**ブラウザーやGitHub連携だけで読む場合：** `main`の最新コミットIDを確認し、その時点の`AGENTS.md`→`docs/PROGRESS.md`→対象ソースの順に読みます。調査中にmainが更新される可能性があるため、複数ファイルを照合する場合は同じコミットIDに固定して取得します。GitHubのURLでは`blob/main/…`の`main`を確認済みのコミットIDへ置き換えると、その版を指すリンクになります。更新を追うURLと、検証済みの版を固定するURLを使い分けてください。
+
+**既存のローカル作業場所で確認する場合：** PocketForgeのリポジトリ内で、まず次を実行します。
+
+```sh
+git remote -v
+git status --short --branch
+git branch --show-current
+git fetch origin
+git rev-parse HEAD origin/main
+git log --oneline --left-right HEAD...origin/main
+git diff --stat HEAD origin/main
+git diff
+git diff --cached
+```
+
+`origin`が上記のPocketForgeリポジトリか確認します。`fetch`はリモートの履歴を取得し、作業ファイルを上書きしません。成功したfetch後に`HEAD`と`origin/main`が一致し、未コミット変更・未追跡ファイルもなければ、その取得時点のmainと一致しています。履歴の`<`は手元だけ、`>`はorigin/mainだけにあるコミットです。`git diff`は未ステージ、`git diff --cached`はステージ済みの変更を示し、未追跡ファイルは`git status`で確認します。fetch失敗時の`origin/main`は古い可能性があるため、最新確認済みとは扱いません。
+
+**mainへ更新する場合：** 作業ツリーがクリーンで、作業中のブランチ・コミットを切り替えてよいと確認できた場合だけ、次を実行します。
+
+```sh
+git switch main
+git pull --ff-only origin main
+```
+
+未コミット変更、別ブランチの作業、手元だけのコミット、履歴の分岐がある場合は内容を確認して保全します。最新版へそろえるために`reset --hard`や`clean`で消してはいけません。`pull --ff-only`が失敗した場合も、強制的な上書きへ切り替えないでください。
+
+**初めて取得する場合：** 権限のある環境の新しい作業場所で`git clone https://github.com/NaokiMatsumoto05/pocketforge.git`を実行し、取得した`pocketforge`フォルダーで`git rev-parse HEAD`を記録します。既存の作業フォルダーへ重ねて展開しないでください。ZIPで受け渡す場合は、元のコミットIDと未コミット変更の有無も一緒に記録します。
+
+**何が変わったかを追う場合：** `git log -5 --oneline`で最近の変更、`git log --oneline -- docs/PROGRESS.md`で報告書の履歴を確認できます。特定コミットの変更は`git show --stat <確認したコミットID>`、2つの版の変更ファイルは`git diff --name-status <以前のコミットID> <新しいコミットID>`で確認します。山括弧の部分は実際に確認したIDへ置き換えます。
+
+**公開中のアプリも確認する場合：** GitHubのmainへの反映とRenderへの公開完了は別です。[Renderサービス](https://dashboard.render.com/web/srv-dbgmm33bc2fs73b50jo0)でliveのデプロイのコミットIDを確認し、調査対象のソースと照合します。文書だけのコミットには`[skip render]`を付けているため、mainと公開版のコミットIDが異なる場合があります。その場合は差分を確認します。iPhoneのDevelopment BuildはMetroが配信するソース、Preview Buildは組み込まれたソース等にも依存するので、インストール済みアプリがmain更新だけで最新版になるとは扱いません。
+
+引き継ぎ報告には「確認日時・対象ブランチ・コミットID・未コミット/未push変更の有無・必要なら公開デプロイID」を残してください。アプリ内でユーザーが作ったプロジェクトはDBに保存される別データであり、この本体リポジトリのcloneやpullでは取得できません。
 
 ### 次の開発で最優先に達成すること
 
@@ -226,6 +276,14 @@ RenderはPocketForgeの管理API・Web画面の配置先、Neonはその保存�
 - **確認結果：** 元の最重要原則「スマートフォンだけで完結」を維持し、実AI・iPhoneのAI編集・E2Bを未確認として記載。既存設計書の古い保存方式・公開状況の記述について、最新記録を参照する注記を追加。文書の差分・ローカル参照先・履歴保持を確認。文書のみの変更のため、アプリのテストと外部サービスへの実接続は再実行していない。
 - **完了範囲：** 他のAIが会話や元の添付ファイルなしでも目的と次の作業を把握できる説明を、正本の進捗報告書へ追加。配布用ソースZIPにも反映。
 - **残る作業：** アプリ機能の確認状態はNo.11から変わらない。まずiPhoneでの公開先接続・ログインと1社の実AIによるファイル更新・永続保存を確認し、その後E2B実接続へ進む。
+
+### No.13｜2026-11-05｜最新版の取得と変更履歴の確認手順を追加
+
+- **ユーザーの確認事項：** 最新のファイルをどう追えばよいかまで説明されているか。
+- **調査結果：** リポジトリ・正本・主要ファイルの場所は記載済みだったが、最新版の取得方法と手元・共有済み・公開済みの版の照合手順が不足していた。
+- **実施内容：** main・報告書・コミット履歴へのリンク、Macの作業場所、非公開リポジトリへのアクセス、fetch・状態比較・安全な更新・clone・差分確認の方法を追加。ZIPの鮮度、Render公開版、iPhoneの実行ソース、アプリ内プロジェクトとの違いも説明。
+- **確認結果：** 作業開始時のローカルHEADは`9329ee2`、作業ツリーに変更なし、originはNaokiMatsumoto05/pocketforge。既存の作業履歴を保持し、追加文書の差分・参照先を点検。文書のみの変更のため、アプリテスト・AI通信・実機試験は再実行していない。配布用ソースZIPも更新。
+- **完了範囲・残る作業：** 最新ファイルを追うための引き継ぎ手順を補完。アプリ機能の検証状態は以前の記録から変更なし。外部サービスの稼働状態を今回新たに確認したものではない。
 
 ## 今後の主な課題
 
